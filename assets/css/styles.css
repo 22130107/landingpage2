@@ -1,0 +1,247 @@
+@charset "UTF-8";
+
+/* ==========================================================================
+   Princeton Academy Custom Styles
+   Brand Palette:
+   - Primary Crimson: #8C1823
+   - Dark Burgundy: #5E0D16
+   - Deep Crimson Footer: #46080F
+   - Accent Gold: #C89D35
+   - Warm Cream: #FAF7F2
+   - Clean, sharp architectural lines (hạn chế bo góc, hạn chế icon)
+   ========================================================================== */
+
+:root {
+  --color-primary: #8C1823;
+  --color-primary-dark: #5E0D16;
+  --color-primary-deep: #46080F;
+  --color-primary-light: #B42838;
+  --color-accent-gold: #C89D35;
+  --color-accent-gold-light: #F6E6C2;
+  --color-bg-cream: #FAF7F2;
+  --color-bg-warm: #FFFBF5;
+  --color-text-main: #231F20;
+  --color-text-muted: #595556;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-family: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: var(--color-text-main);
+  background-color: #FFFFFF;
+}
+
+.font-serif {
+  font-family: 'Merriweather', Georgia, serif;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #F1EFEA;
+}
+::-webkit-scrollbar-thumb {
+  background: #8C1823;
+  border-radius: 0px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary-dark);
+}
+
+/* Header Sticky Transitions & Scrolled State */
+#main-header {
+  transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+#main-header.scrolled {
+  background-color: #8C1823 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2) !important;
+}
+
+#main-header.scrolled .nav-item {
+  color: #FFFFFF !important;
+}
+
+#main-header.scrolled .nav-item:hover {
+  color: #F4E2B2 !important;
+  border-bottom-color: #C89D35 !important;
+}
+
+#main-header.scrolled #header-hotline-btn {
+  border-color: rgba(255, 255, 255, 0.75) !important;
+  color: #FFFFFF !important;
+  background-color: transparent !important;
+}
+
+#main-header.scrolled #header-hotline-btn:hover {
+  background-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+#main-header.scrolled #header-cta-btn {
+  background-color: #C89D35 !important;
+  color: #FFFFFF !important;
+}
+
+#main-header.scrolled #header-cta-btn:hover {
+  background-color: #B28827 !important;
+}
+
+#main-header.scrolled #mobile-menu-toggle {
+  color: #FFFFFF !important;
+}
+
+/* Card Subtle Glass & Sharp Architecture */
+.princeton-card {
+  background: #FFFFFF;
+  border: 1px solid #DCD7CE;
+  border-radius: 0px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.princeton-card:hover {
+  transform: translateY(-3px);
+  border-color: #8C1823;
+  box-shadow: 0 12px 30px rgba(140, 24, 35, 0.14);
+}
+
+/* Prominent Bar Card & Drop Shadows for 5 Subjects (Matching User Reference) */
+.princeton-bar-card {
+  background-color: #FFFFFF !important;
+  border: 1.5px solid #8C1823 !important;
+  border-radius: 0px !important;
+  box-shadow: 0 10px 25px rgba(140, 24, 35, 0.2) !important;
+  transition: transform 0.25s ease, box-shadow 0.25s ease !important;
+}
+
+.princeton-bar-card:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 14px 32px rgba(140, 24, 35, 0.28) !important;
+}
+
+.badge-float-shadow {
+  box-shadow: 0 4px 14px rgba(140, 24, 35, 0.25) !important;
+}
+
+.princeton-showcase-frame {
+  background-color: #FFFFFF !important;
+  border: 1.5px solid #8C1823 !important;
+  border-radius: 0px !important;
+  box-shadow: 0 10px 30px rgba(140, 24, 35, 0.2) !important;
+  transition: transform 0.25s ease, box-shadow 0.25s ease !important;
+}
+
+.princeton-showcase-frame:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 16px 40px rgba(140, 24, 35, 0.28) !important;
+}
+
+/* Gold Gradient Accents */
+.text-gold-gradient {
+  background: linear-gradient(135deg, #B8860B 0%, #D4AF37 50%, #AA7C11 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.bg-gold-gradient {
+  background: linear-gradient(135deg, #C89D35 0%, #E3BC59 50%, #B28827 100%);
+}
+
+.bg-crimson-gradient {
+  background: linear-gradient(135deg, #8C1823 0%, #6E101A 100%);
+}
+
+/* Image Hover Zoom */
+.img-zoom-container {
+  overflow: hidden;
+  border-radius: 0px;
+}
+.img-zoom-container img {
+  transition: transform 0.5s ease;
+}
+.img-zoom-container:hover img {
+  transform: scale(1.04);
+}
+
+/* Interactive Map Container - Sharp Rectangular */
+.map-frame-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 480px;
+  border-radius: 0px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+  border: 1px solid #D9D2C7;
+}
+
+/* Pulse Animation for Floating Hotline */
+@keyframes softPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(140, 24, 35, 0.6);
+  }
+  70% {
+    box-shadow: 0 0 0 12px rgba(140, 24, 35, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(140, 24, 35, 0);
+  }
+}
+
+.pulse-call {
+  animation: softPulse 2s infinite;
+}
+
+/* Floating Action Container */
+.floating-actions {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Tabs - Sharp Rectangular */
+.tab-btn {
+  border-radius: 0px;
+  background-color: #F0ECE4;
+  color: #555555;
+  transition: all 0.2s ease;
+  border-bottom: 2px solid transparent;
+}
+
+.tab-btn.active {
+  background-color: #8C1823;
+  color: #FFFFFF;
+  border-bottom: 2px solid #C89D35;
+}
+
+/* Campus Selector Item - Sharp Rectangular */
+.campus-item {
+  border-radius: 0px;
+  border-left: 3px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.campus-item:hover {
+  background-color: #FFF6F7;
+  border-left-color: rgba(140, 24, 35, 0.4);
+}
+
+.campus-item.active {
+  background-color: #FFF2F4;
+  border-left-color: var(--color-primary);
+  border-color: #E8D3D6;
+  box-shadow: 0 2px 8px rgba(140, 24, 35, 0.06);
+}
+
+/* Modal styling */
+.modal-overlay {
+  background-color: rgba(20, 10, 12, 0.65);
+  backdrop-filter: blur(2px);
+}
