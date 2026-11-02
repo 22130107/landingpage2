@@ -1,32 +1,32 @@
 /**
  * =========================================================================
- * GOOGLE APPS SCRIPT: TỰ ĐỘNG THU THẬP LEAD VÀO GOOGLE SHEETS
- * Dành cho Landing Page: Princeton Academy (Phụ Huynh & Đối Tác)
+ * GOOGLE APPS SCRIPT: TỰ ĐỘNG THU THẬP LEAD NHÀ ĐẦU TƯ & ĐỐI TÁC
+ * Dành cho Landing Page: Princeton Academy (Hợp Tác Nhượng Quyền)
  * =========================================================================
  * 
- * HƯỚNG DẪN 3 BƯỚC TRIỂN KHAI:
+ * HƯỚNG DẪN TRIỂN KHAI:
  * 1. Mở Google Sheet (trang tính mới), vào menu: Tiện ích mở rộng (Extensions) > Apps Script.
- * 2. Xóa hết code mặc định, dán toàn bộ nội dung file này vào và bấm icon Lưu (Save / Ctrl + S).
+ * 2. Xóa hết code mặc định trong editor, dán toàn bộ nội dung file này vào và bấm icon Lưu (Save / Ctrl + S).
  * 3. Bấm "Triển khai" (Deploy) > "Tùy chọn triển khai mới" (New deployment):
  *    - Chọn loại: "Ứng dụng web" (Web app).
- *    - Mô tả: "Princeton Academy Lead Form".
+ *    - Mô tả: "Princeton Academy Partner Lead Form".
  *    - Thực thi dưới dạng (Execute as): "Tôi" (Me - email của bạn).
  *    - Ai có quyền truy cập (Who has access): "Bất kỳ ai" (Anyone).
- *    - Bấm "Triển khai" (Deploy) > Cấp quyền truy cập nếu Google hỏi.
+ *    - Bấm "Triển khai" (Deploy) > Cấp quyền truy cập nếu Google hỏi xác thực.
  *    - Sao chép "URL ứng dụng web" (dạng https://script.google.com/macros/s/.../exec).
- * 4. Dán URL đó vào biến GOOGLE_SHEET_URL trong file assets/js/main.js của landing page.
+ * 4. Dán URL đó vào biến GOOGLE_SHEET_URL trong file assets/js/partner.js của landing page.
  */
 
 function doPost(e) {
   var lock = LockService.getScriptLock();
-  // Khóa 10 giây để chống xung đột ghi dữ liệu đồng thời nếu nhiều người bấm cùng lúc
+  // Khóa 10 giây để chống xung đột ghi dữ liệu đồng thời nếu nhiều người gửi cùng lúc
   lock.tryLock(10000);
 
   try {
     var ss = SpreadsheetApp.getActiveSpreadsheet();
     var params = {};
 
-    // 1. Phân tích dữ liệu nhận được (hỗ trợ cả FormData, x-www-form-urlencoded và JSON)
+    // 1. Phân tích dữ liệu nhận được (hỗ trợ FormData, x-www-form-urlencoded và JSON)
     if (e && e.parameter && Object.keys(e.parameter).length > 0) {
       params = e.parameter;
     } else if (e && e.postData && e.postData.contents) {
@@ -37,95 +37,77 @@ function doPost(e) {
       }
     }
 
-    var formType = params.formType || (params.type === 'partner' ? 'Đối Tác' : 'Phụ Huynh');
     var timestamp = params.createdAt || Utilities.formatDate(new Date(), "Asia/Ho_Chi_Minh", "dd/MM/yyyy HH:mm:ss");
+    var formSource = params.formSource || (params.source || "Landing Page Đối Tác");
+    var name = params.name || "";
+    var phone = params.phone ? "'" + params.phone : ""; // Thêm nháy đơn để không bị mất số 0 đầu
+    var province = params.province || "";
+    var model = params.model || "";
+    var budget = params.budget || "";
+    var email = params.email || "";
+    var notes = params.notes || "";
 
-    // =====================================================================
-    // TRƯỜNG HỢP 1: LEAD ĐỐI TÁC & NHÀ ĐẦU TƯ
-    // =====================================================================
-    if (formType === 'Đối Tác' || params.type === 'partner') {
-      var sheetPartner = ss.getSheetByName("Đối Tác");
-      if (!sheetPartner) {
-        sheetPartner = ss.insertSheet("Đối Tác");
-        var headersPartner = [
-          "Thời Gian Gửi", 
-          "Họ & Tên Đại Diện", 
-          "Số Điện Thoại", 
-          "Email Doanh Nghiệp", 
-          "Tỉnh / Thành Phố", 
-          "Mô Hình Dự Kiến", 
-          "Ghi Chú Mặt Bằng / Quy Mô"
-        ];
-        sheetPartner.appendRow(headersPartner);
-        var headerRangePartner = sheetPartner.getRange(1, 1, 1, headersPartner.length);
-        headerRangePartner.setFontWeight("bold");
-        headerRangePartner.setBackground("#C89D35"); // Màu vàng Gold Princeton
-        headerRangePartner.setFontColor("#FFFFFF");
-        headerRangePartner.setHorizontalAlignment("center");
-        sheetPartner.setFrozenRows(1);
-        
-        // Căn độ rộng cột đẹp mắt
-        sheetPartner.setColumnWidth(1, 160);
-        sheetPartner.setColumnWidth(2, 200);
-        sheetPartner.setColumnWidth(3, 140);
-        sheetPartner.setColumnWidth(4, 200);
-        sheetPartner.setColumnWidth(5, 180);
-        sheetPartner.setColumnWidth(6, 260);
-        sheetPartner.setColumnWidth(7, 300);
+    var sheet = ss.getSheetByName("Đối Tác");
+    var NEW_HEADERS = [
+      "Thời Gian Gửi",
+      "Nguồn Form",
+      "Họ & Tên Nhà Đầu Tư",
+      "Số Điện Thoại",
+      "Tỉnh / Thành Phố",
+      "Mô Hình Quan Tâm",
+      "Ngân Sách Dự Kiến",
+      "Email",
+      "Ghi Chú"
+    ];
+
+    if (!sheet) {
+      sheet = ss.insertSheet("Đối Tác");
+    }
+
+    var lastRow = sheet.getLastRow();
+    var lastCol = sheet.getLastColumn();
+
+    // Trường hợp 1: Sheet hoàn toàn mới hoặc chưa có tiêu đề
+    if (lastRow === 0 || lastCol === 0) {
+      sheet.appendRow(NEW_HEADERS);
+      formatHeader(sheet, NEW_HEADERS.length);
+    } else if (lastRow === 1) {
+      // Trường hợp 2: Sheet chỉ mới có dòng tiêu đề cũ (chưa có dòng dữ liệu nào)
+      var firstRow = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
+      if (firstRow.indexOf("Nguồn Form") === -1) {
+        sheet.getRange(1, 1, 1, NEW_HEADERS.length).setValues([NEW_HEADERS]);
+        formatHeader(sheet, NEW_HEADERS.length);
       }
+    }
 
-      sheetPartner.appendRow([
+    // Đọc hàng tiêu đề hiện tại để phân phối dữ liệu đúng cột
+    var currentHeaders = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+    var hasSourceCol = currentHeaders.indexOf("Nguồn Form") !== -1;
+    var hasBudgetCol = currentHeaders.indexOf("Ngân Sách Dự Kiến") !== -1;
+
+    if (hasSourceCol && hasBudgetCol) {
+      // Ghi theo cấu trúc 9 cột chuẩn mới
+      sheet.appendRow([
         timestamp,
-        params.name || '',
-        params.phone ? "'" + params.phone : '', // Thêm nháy đơn để không bị mất số 0 đầu
-        params.email || '',
-        params.province || '',
-        params.model || '',
-        params.notes || ''
+        formSource,
+        name,
+        phone,
+        province,
+        model,
+        budget,
+        email,
+        notes
       ]);
-
-    // =====================================================================
-    // TRƯỜNG HỢP 2: LEAD PHỤ HUYNH ĐĂNG KÝ THAM QUAN
-    // =====================================================================
     } else {
-      var sheetParent = ss.getSheetByName("Phụ Huynh");
-      if (!sheetParent) {
-        sheetParent = ss.insertSheet("Phụ Huynh");
-        var headersParent = [
-          "Thời Gian Gửi", 
-          "Họ & Tên Phụ Huynh", 
-          "Số Điện Thoại", 
-          "Độ Tuổi Bé", 
-          "Email Liên Hệ", 
-          "Cơ Sở Quan Tâm", 
-          "Ghi Chú Gửi Trường"
-        ];
-        sheetParent.appendRow(headersParent);
-        var headerRangeParent = sheetParent.getRange(1, 1, 1, headersParent.length);
-        headerRangeParent.setFontWeight("bold");
-        headerRangeParent.setBackground("#8C1823"); // Màu đỏ Crimson Princeton
-        headerRangeParent.setFontColor("#FFFFFF");
-        headerRangeParent.setHorizontalAlignment("center");
-        sheetParent.setFrozenRows(1);
-
-        // Căn độ rộng cột đẹp mắt
-        sheetParent.setColumnWidth(1, 160);
-        sheetParent.setColumnWidth(2, 200);
-        sheetParent.setColumnWidth(3, 140);
-        sheetParent.setColumnWidth(4, 150);
-        sheetParent.setColumnWidth(5, 200);
-        sheetParent.setColumnWidth(6, 280);
-        sheetParent.setColumnWidth(7, 300);
-      }
-
-      sheetParent.appendRow([
+      // Tương thích ngược nếu sheet cũ đã có sẵn nhiều dòng dữ liệu từ trước
+      sheet.appendRow([
         timestamp,
-        params.name || '',
-        params.phone ? "'" + params.phone : '', // Thêm nháy đơn để không bị mất số 0 đầu
-        params.childAge || '',
-        params.email || '',
-        params.campus || '',
-        params.notes || ''
+        name,
+        phone,
+        email,
+        province,
+        model || budget || "",
+        "[" + formSource + "] " + (budget ? "Ngân sách: " + budget + " | " : "") + notes
       ]);
     }
 
@@ -143,8 +125,30 @@ function doPost(e) {
   }
 }
 
+/**
+ * Định dạng hàng tiêu đề theo phong cách nhận diện Princeton Academy (Màu vàng Gold)
+ */
+function formatHeader(sheet, numCols) {
+  var headerRange = sheet.getRange(1, 1, 1, numCols);
+  headerRange.setFontWeight("bold");
+  headerRange.setBackground("#C89D35"); // Màu vàng Gold Princeton
+  headerRange.setFontColor("#FFFFFF");
+  headerRange.setHorizontalAlignment("center");
+  sheet.setFrozenRows(1);
+
+  sheet.setColumnWidth(1, 160); // Thời Gian Gửi
+  sheet.setColumnWidth(2, 220); // Nguồn Form
+  sheet.setColumnWidth(3, 200); // Họ & Tên Nhà Đầu Tư
+  sheet.setColumnWidth(4, 150); // Số Điện Thoại
+  sheet.setColumnWidth(5, 180); // Tỉnh / Thành Phố
+  sheet.setColumnWidth(6, 220); // Mô Hình Quan Tâm
+  sheet.setColumnWidth(7, 200); // Ngân Sách Dự Kiến
+  sheet.setColumnWidth(8, 180); // Email
+  sheet.setColumnWidth(9, 300); // Ghi Chú
+}
+
 function doGet(e) {
   return ContentService
-    .createTextOutput("Princeton Academy Google Apps Script Web App is active!")
+    .createTextOutput("Princeton Academy Partner Lead Web App is active!")
     .setMimeType(ContentService.MimeType.TEXT);
 }

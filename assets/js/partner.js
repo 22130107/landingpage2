@@ -74,6 +74,8 @@ async function sendToGoogleSheet(data) {
 /* -------------------------------------------------------------------------
    Partner forms
    ------------------------------------------------------------------------- */
+let selectedModelSource = null;
+
 function initPartnerForms() {
   const heroForm = document.getElementById("hero-partner-form");
   const finalForm = document.getElementById("final-partner-form");
@@ -94,13 +96,14 @@ function initPartnerForms() {
 
       const payload = {
         formType: "Đối Tác",
+        formSource: "Hero Form (Đầu trang)",
         name,
         phone,
         email: "",
         province,
-        model: "Tư vấn theo ngân sách đầu tư",
-        budget,
-        notes: `Nguồn: Hero Form | Ngân sách đầu tư dự kiến: ${budget || "Chưa xác định"}`,
+        model: "Cần tư vấn theo ngân sách",
+        budget: budget || "Chưa xác định",
+        notes: `Đăng ký từ Hero Form đầu trang. Ngân sách dự kiến: ${budget || "Chưa xác định"}`,
         createdAt: nowInVietnam()
       };
 
@@ -124,20 +127,27 @@ function initPartnerForms() {
         return;
       }
 
+      const formSource = selectedModelSource
+        ? `Thẻ mô hình: ${selectedModelSource}`
+        : "CTA Form (Cuối trang)";
+
       const payload = {
         formType: "Đối Tác",
+        formSource,
         name,
         phone,
         email: "",
         province,
-        model,
-        notes: "Nguồn: Form CTA cuối trang - Nhận Franchise Kit & Bảng dòng tiền",
+        model: model || "Chưa xác định",
+        budget: "Chưa xác định",
+        notes: `Đăng ký từ ${formSource}. Mô hình quan tâm: ${model || "Chưa xác định"}`,
         createdAt: nowInVietnam()
       };
 
       const successMessage = `Cảm ơn Quý đối tác <strong>${escapeHtml(name)}</strong>. Hồ sơ mô hình <strong>${escapeHtml(model || "đang quan tâm")}</strong> và bảng dự toán dòng tiền sẽ được Bộ phận Phát triển Hệ thống Princeton Academy gửi tới Quý đối tác qua số <strong>${escapeHtml(phone)}</strong> trong 24 giờ làm việc.`;
 
       await handleFormSubmit(finalForm, payload, "Yêu Cầu Đã Được Tiếp Nhận!", successMessage);
+      selectedModelSource = null;
     });
   }
 }
@@ -195,6 +205,7 @@ function initModelPreselect() {
   modelButtons.forEach((button) => {
     button.addEventListener("click", () => {
       const model = button.getAttribute("data-model");
+      selectedModelSource = model;
       const matchingOption = Array.from(modelSelect.options).find((option) => option.value === model);
 
       if (matchingOption) {
@@ -206,6 +217,12 @@ function initModelPreselect() {
         window.setTimeout(() => finalCard.classList.remove("form-attention"), 1800);
       }
     });
+  });
+
+  modelSelect.addEventListener("change", () => {
+    if (modelSelect.value) {
+      selectedModelSource = null;
+    }
   });
 }
 
