@@ -47,8 +47,8 @@
     }
   </script>
 
-  <!-- Minimal Essential Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- Minimal Essential Icons with SRI -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer">
 
   <!-- Core brand styles + partner page styles -->
   <link rel="stylesheet" href="assets/css/styles.css?v=5">
@@ -241,20 +241,26 @@
                   Điền thông tin để chuyên viên gửi trọn bộ hồ sơ mô hình, bảng dự toán CAPEX/OPEX và lộ trình triển khai.
                 </p>
 
-                <form id="hero-partner-form" class="space-y-3">
+                <form id="hero-partner-form" method="POST" action="#" class="space-y-3">
+                  <!-- Honeypot anti-bot (hidden from human users) -->
+                  <div style="position:absolute;left:-9999px;top:-9999px;" aria-hidden="true">
+                    <label for="hero-company-hp">Company</label>
+                    <input type="text" id="hero-company-hp" name="_hp_company" tabindex="-1" autocomplete="off">
+                  </div>
+
                   <div>
                     <label for="hero-name" class="block text-[10px] font-bold text-gray-700 uppercase tracking-wider mb-1.5">Họ và tên Nhà đầu tư <span class="text-[#8C1823]">*</span></label>
-                    <input type="text" id="hero-name" name="name" required autocomplete="name" placeholder="Ví dụ: Nguyễn Văn An" class="form-field">
+                    <input type="text" id="hero-name" name="name" required maxlength="100" autocomplete="name" placeholder="Ví dụ: Nguyễn Văn An" class="form-field">
                   </div>
 
                   <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                       <label for="hero-phone" class="block text-[10px] font-bold text-gray-700 uppercase tracking-wider mb-1.5">Số điện thoại / Zalo <span class="text-[#8C1823]">*</span></label>
-                      <input type="tel" id="hero-phone" name="phone" required autocomplete="tel" inputmode="tel" placeholder="09xx xxx xxx" class="form-field">
+                      <input type="tel" id="hero-phone" name="phone" required maxlength="16" pattern="^(\+?84|0)[\d\s.-]{9,15}$" title="Vui lòng nhập số điện thoại hợp lệ (10 số, ví dụ 0988 284 799)" autocomplete="tel" inputmode="tel" placeholder="09xx xxx xxx" class="form-field">
                     </div>
                     <div>
                       <label for="hero-province" class="block text-[10px] font-bold text-gray-700 uppercase tracking-wider mb-1.5">Tỉnh / Thành phố <span class="text-[#8C1823]">*</span></label>
-                      <input type="text" id="hero-province" name="province" required autocomplete="address-level1" placeholder="Ví dụ: Hà Nội" class="form-field">
+                      <input type="text" id="hero-province" name="province" required maxlength="100" autocomplete="address-level1" placeholder="Ví dụ: Hà Nội" class="form-field">
                     </div>
                   </div>
 
@@ -276,7 +282,7 @@
 
                   <p class="flex items-center justify-center gap-1.5 text-[10px] text-gray-500 leading-relaxed pt-1">
                     <i class="fa-solid fa-lock text-[#C89D35]"></i>
-                    Thông tin được bảo mật 100%. Phản hồi trong 24 giờ làm việc.
+                    Princeton Academy cam kết bảo mật 100% thông tin đối tác.
                   </p>
                 </form>
               </div>
@@ -1080,20 +1086,26 @@
                 <img src="assets/logo/LOGO%20PRINCETON%20PNG-01.png" alt="Princeton Academy" class="w-9 h-9 object-contain shrink-0" width="512" height="512">
               </div>
 
-              <form id="final-partner-form" class="mt-5 space-y-3.5">
+              <form id="final-partner-form" method="POST" action="#" class="mt-5 space-y-3.5">
+                <!-- Honeypot anti-bot (hidden from human users) -->
+                <div style="position:absolute;left:-9999px;top:-9999px;" aria-hidden="true">
+                  <label for="final-company-hp">Company</label>
+                  <input type="text" id="final-company-hp" name="_hp_company" tabindex="-1" autocomplete="off">
+                </div>
+
                 <div>
                   <label for="final-name" class="block text-[10px] font-bold text-gray-700 uppercase tracking-wider mb-1.5">Họ và tên Quý đối tác <span class="text-[#8C1823]">*</span></label>
-                  <input type="text" id="final-name" name="name" required autocomplete="name" placeholder="Ví dụ: Trần Quốc Huy" class="form-field">
+                  <input type="text" id="final-name" name="name" required maxlength="100" autocomplete="name" placeholder="Ví dụ: Trần Quốc Huy" class="form-field">
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label for="final-phone" class="block text-[10px] font-bold text-gray-700 uppercase tracking-wider mb-1.5">Số điện thoại / Zalo <span class="text-[#8C1823]">*</span></label>
-                    <input type="tel" id="final-phone" name="phone" required autocomplete="tel" inputmode="tel" placeholder="09xx xxx xxx" class="form-field">
+                    <input type="tel" id="final-phone" name="phone" required maxlength="16" pattern="^(\+?84|0)[\d\s.-]{9,15}$" title="Vui lòng nhập số điện thoại hợp lệ (10 số, ví dụ 0988 284 799)" autocomplete="tel" inputmode="tel" placeholder="09xx xxx xxx" class="form-field">
                   </div>
                   <div>
                     <label for="final-province" class="block text-[10px] font-bold text-gray-700 uppercase tracking-wider mb-1.5">Tỉnh / Thành phố đầu tư <span class="text-[#8C1823]">*</span></label>
-                    <input type="text" id="final-province" name="province" required autocomplete="address-level1" placeholder="Ví dụ: Đà Nẵng" class="form-field">
+                    <input type="text" id="final-province" name="province" required maxlength="100" autocomplete="address-level1" placeholder="Ví dụ: Đà Nẵng" class="form-field">
                   </div>
                 </div>
 
@@ -1121,7 +1133,7 @@
 
                 <p class="flex items-center justify-center gap-1.5 text-[10px] text-gray-500 leading-relaxed pt-1">
                   <i class="fa-solid fa-lock text-[#C89D35]"></i>
-                  Thông tin của Quý đối tác được bảo mật tuyệt đối.
+                  Princeton Academy cam kết bảo mật tuyệt đối 100% dữ liệu thông tin đối tác.
                 </p>
               </form>
             </div>

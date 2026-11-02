@@ -1,0 +1,12 @@
+# Files excluded from Vercel deployment
+google-apps-script.js
+serve.js
+package.json
+package-lock.json
+README.md
+.git
+.gitignore
+.vercelignore
+*.log
+.DS_Store
+Thumbs.db

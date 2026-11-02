@@ -76,6 +76,9 @@ async function sendToGoogleSheet(data) {
    ------------------------------------------------------------------------- */
 let selectedModelSource = null;
 
+const COOLDOWN_KEY = "_pa_partner_cooldown";
+const COOLDOWN_MS = 10000; // 10 giây giữa 2 lần gửi
+
 function initPartnerForms() {
   const heroForm = document.getElementById("hero-partner-form");
   const finalForm = document.getElementById("final-partner-form");
@@ -84,13 +87,34 @@ function initPartnerForms() {
     heroForm.addEventListener("submit", async (event) => {
       event.preventDefault();
 
-      const name = valueOf("hero-name");
-      const phone = valueOf("hero-phone");
-      const province = valueOf("hero-province");
-      const budget = valueOf("hero-budget");
+      // Bẫy Honeypot chống bot tự động spam
+      const hp = valueOf("hero-company-hp");
+      if (hp) {
+        heroForm.reset();
+        showPartnerModal("Đăng Ký Nhận Franchise Kit Thành Công!", "Yêu cầu của Quý nhà đầu tư đã được tiếp nhận.");
+        return;
+      }
 
-      if (!name || !phone) {
-        alert("Vui lòng điền họ tên và số điện thoại / Zalo của Quý nhà đầu tư.");
+      // Kiểm tra cooldown chống gửi liên tục
+      const lastSubmit = parseInt(sessionStorage.getItem(COOLDOWN_KEY) || "0", 10);
+      if (Date.now() - lastSubmit < COOLDOWN_MS) {
+        alert("Quý nhà đầu tư vui lòng đợi ít giây trước khi gửi tiếp.");
+        return;
+      }
+
+      const name = sanitizeInput(valueOf("hero-name"), 100);
+      const rawPhone = valueOf("hero-phone");
+      const phone = normalizePhoneNumber(rawPhone);
+      const province = sanitizeInput(valueOf("hero-province"), 100);
+      const budget = sanitizeInput(valueOf("hero-budget"), 100);
+
+      if (!name || name.length < 2) {
+        alert("Vui lòng điền họ tên đầy đủ của Quý nhà đầu tư.");
+        return;
+      }
+
+      if (!isValidPhoneNumber(phone)) {
+        alert("Vui lòng nhập số điện thoại hợp lệ (10 số, ví dụ 0988 284 799 hoặc +84 988 284 799).");
         return;
       }
 
@@ -103,13 +127,15 @@ function initPartnerForms() {
         province,
         model: "Cần tư vấn theo ngân sách",
         budget: budget || "Chưa xác định",
-        notes: `Đăng ký từ Hero Form đầu trang. Ngân sách dự kiến: ${budget || "Chưa xác định"}`,
-        createdAt: nowInVietnam()
+        notes: `Đăng ký từ Hero Form đầu trang. Ngân sách dự kiến: ${budget || "Chưa xác định"}`
       };
 
       const successMessage = `Cảm ơn Quý nhà đầu tư <strong>${escapeHtml(name)}</strong>. Bộ phận Phát triển Hệ thống Princeton Academy sẽ liên hệ qua số <strong>${escapeHtml(phone)}</strong> trong 24 giờ làm việc để gửi Franchise Kit và bảng tính dòng tiền cho khu vực <strong>${escapeHtml(province || "Quý đối tác")}</strong>.`;
 
-      await handleFormSubmit(heroForm, payload, "Đăng Ký Nhận Franchise Kit Thành Công!", successMessage);
+      const success = await handleFormSubmit(heroForm, payload, "Đăng Ký Nhận Franchise Kit Thành Công!", successMessage);
+      if (success) {
+        sessionStorage.setItem(COOLDOWN_KEY, String(Date.now()));
+      }
     });
   }
 
@@ -117,13 +143,34 @@ function initPartnerForms() {
     finalForm.addEventListener("submit", async (event) => {
       event.preventDefault();
 
-      const name = valueOf("final-name");
-      const phone = valueOf("final-phone");
-      const province = valueOf("final-province");
-      const model = valueOf("final-model");
+      // Bẫy Honeypot chống bot tự động spam
+      const hp = valueOf("final-company-hp");
+      if (hp) {
+        finalForm.reset();
+        showPartnerModal("Yêu Cầu Đã Được Tiếp Nhận!", "Yêu cầu của Quý đối tác đã được tiếp nhận.");
+        return;
+      }
 
-      if (!name || !phone) {
-        alert("Vui lòng điền họ tên và số điện thoại / Zalo của Quý đối tác.");
+      // Kiểm tra cooldown chống gửi liên tục
+      const lastSubmit = parseInt(sessionStorage.getItem(COOLDOWN_KEY) || "0", 10);
+      if (Date.now() - lastSubmit < COOLDOWN_MS) {
+        alert("Quý đối tác vui lòng đợi ít giây trước khi gửi tiếp.");
+        return;
+      }
+
+      const name = sanitizeInput(valueOf("final-name"), 100);
+      const rawPhone = valueOf("final-phone");
+      const phone = normalizePhoneNumber(rawPhone);
+      const province = sanitizeInput(valueOf("final-province"), 100);
+      const model = sanitizeInput(valueOf("final-model"), 100);
+
+      if (!name || name.length < 2) {
+        alert("Vui lòng điền họ tên đầy đủ của Quý đối tác.");
+        return;
+      }
+
+      if (!isValidPhoneNumber(phone)) {
+        alert("Vui lòng nhập số điện thoại hợp lệ (10 số, ví dụ 0988 284 799 hoặc +84 988 284 799).");
         return;
       }
 
@@ -140,21 +187,23 @@ function initPartnerForms() {
         province,
         model: model || "Chưa xác định",
         budget: "Chưa xác định",
-        notes: `Đăng ký từ ${formSource}. Mô hình quan tâm: ${model || "Chưa xác định"}`,
-        createdAt: nowInVietnam()
+        notes: `Đăng ký từ ${formSource}. Mô hình quan tâm: ${model || "Chưa xác định"}`
       };
 
       const successMessage = `Cảm ơn Quý đối tác <strong>${escapeHtml(name)}</strong>. Hồ sơ mô hình <strong>${escapeHtml(model || "đang quan tâm")}</strong> và bảng dự toán dòng tiền sẽ được Bộ phận Phát triển Hệ thống Princeton Academy gửi tới Quý đối tác qua số <strong>${escapeHtml(phone)}</strong> trong 24 giờ làm việc.`;
 
-      await handleFormSubmit(finalForm, payload, "Yêu Cầu Đã Được Tiếp Nhận!", successMessage);
-      selectedModelSource = null;
+      const success = await handleFormSubmit(finalForm, payload, "Yêu Cầu Đã Được Tiếp Nhận!", successMessage);
+      if (success) {
+        sessionStorage.setItem(COOLDOWN_KEY, String(Date.now()));
+        selectedModelSource = null;
+      }
     });
   }
 }
 
 async function handleFormSubmit(form, payload, successTitle, successMessage) {
   const submitButton = form.querySelector('button[type="submit"]');
-  if (!submitButton) return;
+  if (!submitButton) return false;
 
   const originalHtml = submitButton.innerHTML;
   submitButton.disabled = true;
@@ -167,11 +216,12 @@ async function handleFormSubmit(form, payload, successTitle, successMessage) {
 
   if (!sent) {
     alert("Kết nối đang gián đoạn. Vui lòng thử lại hoặc gọi trực tiếp hotline 0988.284.799.");
-    return;
+    return false;
   }
 
   form.reset();
   showPartnerModal(successTitle, successMessage);
+  return true;
 }
 
 function valueOf(id) {
@@ -190,6 +240,48 @@ function escapeHtml(value) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
+}
+
+/**
+ * Chuẩn hóa số điện thoại Việt Nam về định dạng thống nhất 10 số (bắt đầu bằng 0)
+ * Hỗ trợ các định dạng: "0988 284 799", "+84 988.284.799", "84988284799"
+ */
+function normalizePhoneNumber(raw) {
+  if (!raw) return "";
+  let clean = String(raw).replace(/[\s().-]/g, "");
+  if (clean.startsWith("+84")) {
+    clean = "0" + clean.slice(3);
+  } else if (clean.startsWith("84") && clean.length === 11) {
+    clean = "0" + clean.slice(2);
+  }
+  return clean;
+}
+
+/**
+ * Kiểm tra định dạng số điện thoại Việt Nam hợp lệ (10 chữ số, đầu số hợp lệ của VN)
+ * Đầu số hợp lệ: 03x, 05x, 07x, 08x, 09x
+ */
+function isValidPhoneNumber(phone) {
+  if (!phone) return false;
+  return /^0[35789]\d{8}$/.test(phone);
+}
+
+/**
+ * Chuẩn hóa và làm sạch dữ liệu đầu vào:
+ * 1. Loại bỏ các ký tự điều khiển ASCII ẩn
+ * 2. Giới hạn độ dài maxLen
+ * 3. Chống Formula Injection (CWE-1236) nếu bắt đầu bằng toán tử =, +, -, @, \t, \r
+ */
+function sanitizeInput(value, maxLen = 100) {
+  if (value === null || value === undefined) return "";
+  let str = String(value).trim().replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "");
+  if (maxLen && str.length > maxLen) {
+    str = str.slice(0, maxLen);
+  }
+  if (/^[=+@\-\t\r]/.test(str)) {
+    str = "'" + str;
+  }
+  return str;
 }
 
 /* -------------------------------------------------------------------------
