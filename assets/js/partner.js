@@ -3,7 +3,7 @@
  * Handles partner lead forms, model pre-selection, navigation and modal UX.
  */
 
-const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbx8Lbh6mDVfMqUP0HqhCgW504f497bfTF_eGW8AQ6hwrEp_x3MO3Cwb2_Cv6ynnvqqTUQ/exec";
+const LEAD_API_URL = "/api/lead";
 
 document.addEventListener("DOMContentLoaded", () => {
   initHeaderScroll();
@@ -45,28 +45,26 @@ function initProcessReveal() {
    Google Sheets integration
    ------------------------------------------------------------------------- */
 async function sendToGoogleSheet(data) {
-  if (!GOOGLE_SHEET_URL) {
-    console.info("GOOGLE_SHEET_URL chưa được cấu hình. Lead chỉ hiển thị ở chế độ demo.");
-    return true;
-  }
-
   try {
     const body = new URLSearchParams();
     Object.entries(data).forEach(([key, value]) => {
       body.append(key, value == null ? "" : String(value));
     });
 
-    await fetch(GOOGLE_SHEET_URL, {
+    const response = await fetch(LEAD_API_URL, {
       method: "POST",
-      mode: "no-cors",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded"
       },
       body: body.toString()
     });
-    return true;
+
+    if (!response.ok) return false;
+
+    const result = await response.json();
+    return result.result === "success";
   } catch (error) {
-    console.error("Không thể gửi dữ liệu tới Google Sheets:", error);
+    console.error("Không thể gửi dữ liệu tới Lead API:", error);
     return false;
   }
 }
