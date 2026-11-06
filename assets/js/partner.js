@@ -6,6 +6,7 @@
 const LEAD_API_URL = "/api/lead";
 
 document.addEventListener("DOMContentLoaded", () => {
+  resetHoneypots();
   initHeaderScroll();
   initMobileMenu();
   initBackToTop();
@@ -14,6 +15,9 @@ document.addEventListener("DOMContentLoaded", () => {
   initSuccessModal();
   initProcessReveal();
 });
+
+// Đảm bảo checkbox honeypot luôn trống khi người dùng quay lại trang (bfcache).
+window.addEventListener("pageshow", resetHoneypots);
 
 /* -------------------------------------------------------------------------
    Process timeline reveal animation
@@ -86,7 +90,7 @@ function initPartnerForms() {
       event.preventDefault();
 
       // Bẫy Honeypot chống bot tự động spam
-      const hp = valueOf("hero-company-hp");
+      const hp = isHoneypotFilled("hero-hp-verify");
       if (hp) {
         heroForm.reset();
         showPartnerModal("Đăng Ký Nhận Franchise Kit Thành Công!", "Yêu cầu của Quý nhà đầu tư đã được tiếp nhận.");
@@ -142,7 +146,7 @@ function initPartnerForms() {
       event.preventDefault();
 
       // Bẫy Honeypot chống bot tự động spam
-      const hp = valueOf("final-company-hp");
+      const hp = isHoneypotFilled("final-hp-verify");
       if (hp) {
         finalForm.reset();
         showPartnerModal("Yêu Cầu Đã Được Tiếp Nhận!", "Yêu cầu của Quý đối tác đã được tiếp nhận.");
@@ -225,6 +229,18 @@ async function handleFormSubmit(form, payload, successTitle, successMessage) {
 function valueOf(id) {
   const element = document.getElementById(id);
   return element ? element.value.trim() : "";
+}
+
+function isHoneypotFilled(id) {
+  const element = document.getElementById(id);
+  return Boolean(element && element.checked);
+}
+
+function resetHoneypots() {
+  ["hero-hp-verify", "final-hp-verify"].forEach((id) => {
+    const element = document.getElementById(id);
+    if (element) element.checked = false;
+  });
 }
 
 function nowInVietnam() {

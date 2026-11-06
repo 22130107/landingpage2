@@ -242,10 +242,9 @@
                 </p>
 
                 <form id="hero-partner-form" method="POST" action="#" class="space-y-3">
-                  <!-- Honeypot anti-bot (hidden from human users) -->
+                  <!-- Honeypot anti-bot: hidden checkbox, không dùng label để tránh autofill -->
                   <div style="position:absolute;left:-9999px;top:-9999px;" aria-hidden="true">
-                    <label for="hero-company-hp">Company</label>
-                    <input type="text" id="hero-company-hp" name="_hp_company" tabindex="-1" autocomplete="off">
+                    <input type="checkbox" id="hero-hp-verify" name="_hp_company" tabindex="-1" autocomplete="off" data-lpignore="true" data-1p-ignore>
                   </div>
 
                   <div>
@@ -1087,10 +1086,9 @@
               </div>
 
               <form id="final-partner-form" method="POST" action="#" class="mt-5 space-y-3.5">
-                <!-- Honeypot anti-bot (hidden from human users) -->
+                <!-- Honeypot anti-bot: hidden checkbox, không dùng label để tránh autofill -->
                 <div style="position:absolute;left:-9999px;top:-9999px;" aria-hidden="true">
-                  <label for="final-company-hp">Company</label>
-                  <input type="text" id="final-company-hp" name="_hp_company" tabindex="-1" autocomplete="off">
+                  <input type="checkbox" id="final-hp-verify" name="_hp_company" tabindex="-1" autocomplete="off" data-lpignore="true" data-1p-ignore>
                 </div>
 
                 <div>
@@ -1261,6 +1259,6 @@
     </div>
   </div>
 
-  <script src="assets/js/partner.js?v=4"></script>
+  <script src="assets/js/partner.js?v=5"></script>
 </body>
 </html>
